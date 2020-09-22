@@ -19,6 +19,17 @@ const SearchBarCSS = styled.header`
     0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
 `;
 
+const Logo = styled.a`
+  height: 50px;
+  width: 270px;
+  margin-right: 20px;
+  color: #ffffff;
+  content: "";
+  background-size: auto 50px;
+  background-repeat: no-repeat;
+  background-image: url("https://pixabay.com/static/img/logo.svg");
+`;
+
 const SearchFormCSS = styled.form`
   display: flex;
   align-items: center;
@@ -78,6 +89,7 @@ const SearchInputCSS = styled.input`
 
 export {
   SearchBarCSS,
+  Logo,
   SearchFormCSS,
   SearchButtonCSS,
   LabelCSS,

@@ -5,7 +5,8 @@ import imageFinder from "./service/API";
 import { SearchBar } from "./components/SearchBar/SearchBar";
 import { ImageGallery } from "./components/ImageGallery/ImageGallery";
 import { LoadMore } from "./components/Button/Button";
-import Loader from "react-loader-spinner";
+import { Spinner } from "./components/Loader/Loader";
+import { Modal } from "./components/Modal/Modal";
 
 import { AppCSS } from "./styledApp";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
@@ -18,6 +19,9 @@ class App extends Component {
     page: 1,
     results: [],
     total: 0,
+    isLoading: false,
+    isModalShown: false,
+    modalImg: "",
   };
 
   // Create new request
@@ -32,29 +36,31 @@ class App extends Component {
     if (prevRequest === request && prevPage === page) {
       return;
     }
-    console.log(prevRequest, prevPage);
     this.imagesToShow();
   };
 
   // Determine array of images to be shown
   imagesToShow = async () => {
+    this.setState({ isLoading: true });
     const { request, page, results } = this.state;
     if (!request) {
       return;
     }
-    const data = await imageFinder(request, page);
-    console.log(data);
-    console.log(this.isShowMoreVisible());
-    this.setState({
-      results: [...results, ...data.hits],
-      total: data.totalHits,
-    });
-  };
-
-  // Determine if we need to show button Show More
-  isShowMoreVisible = () => {
-    const { page, total, results } = this.state;
-    return !results.length || page * PER_PAGE >= total ? false : true;
+    try {
+      const data = await imageFinder(request, page);
+      this.setState({
+        results: [...results, ...data.hits],
+        total: data.totalHits,
+      });
+    } catch {
+      this.setState({ results: [] });
+    } finally {
+      this.setState({ isLoading: false });
+      window.scrollTo({
+        top: document.documentElement.scrollHeight - 120,
+        behavior: "smooth",
+      });
+    }
   };
 
   //Logic of Show More button
@@ -64,25 +70,53 @@ class App extends Component {
       return;
     }
     this.setState({ page: page + 1 });
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: "smooth",
-    });
+  };
+
+  onGalleryClick = ({ target }) => {
+    const largeImg = target.dataset.fullscreen;
+    this.showModal(largeImg);
+  };
+
+  showModal = (source) => {
+    window.addEventListener("keydown", this.keyPressHandle);
+    this.setState({ isModalShown: true, modalImg: source });
+  };
+
+  closeModal = () => {
+    this.setState({ isModalShown: false, modalImg: "" });
+    document.removeEventListener("keydown", this.keyPressHandle);
+  };
+
+  keyPressHandle = ({ key }) => {
+    const { isModalShown } = this.state;
+    console.log(key, isModalShown);
+    if (isModalShown && key === "Escape") {
+      this.closeModal();
+    }
   };
 
   render() {
+    const {
+      page,
+      total,
+      results,
+      isLoading,
+      isModalShown,
+      modalImg,
+    } = this.state;
+    const isShowMoreVisible =
+      !results.length || page * PER_PAGE >= total ? false : true;
+    const isGalleryVisible = !!results.length && !isLoading;
+
     return (
       <AppCSS>
         <SearchBar onFormSubmit={this.newRequest} />
-        <ImageGallery {...this.state} />
-        {this.isShowMoreVisible() && <LoadMore onButtonClick={this.showMore} />}
-        {/* <Loader
-          type="TailSpin"
-          color="#3f51b5"
-          height={100}
-          width={100}
-          timeout={3000}
-        /> */}
+        {isGalleryVisible && (
+          <ImageGallery onClick={this.onGalleryClick} results={results} />
+        )}
+        {isShowMoreVisible && <LoadMore onClick={this.showMore} />}
+        {isLoading && <Spinner />}
+        {isModalShown && <Modal source={modalImg} onClick={this.closeModal} />}
       </AppCSS>
     );
   }

@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 const AppCSS = styled.div`
   display: grid;
@@ -7,6 +7,4 @@ const AppCSS = styled.div`
   padding-bottom: 24px;
 `;
 
-export {
-  AppCSS,
-}
+export { AppCSS };

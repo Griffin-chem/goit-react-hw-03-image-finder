@@ -3,12 +3,12 @@ import PropTypes from "prop-types";
 
 import {
   SearchBarCSS,
+  Logo,
   SearchFormCSS,
   SearchButtonCSS,
   LabelCSS,
   SearchInputCSS,
-} from './styledSearchBar';
-
+} from "./styledSearchBar";
 
 const INITIAL_STATE = {
   request: "",
@@ -48,6 +48,7 @@ class SearchBar extends Component {
     const { request } = this.state;
     return (
       <SearchBarCSS>
+        <Logo href="https://pixabay.com" />
         <SearchFormCSS onSubmit={this.handleSubmit}>
           <SearchButtonCSS type="submit">
             <LabelCSS>Search</LabelCSS>
