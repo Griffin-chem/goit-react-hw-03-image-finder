@@ -106,7 +106,7 @@ class App extends Component {
     } = this.state;
     const isShowMoreVisible =
       !results.length || page * PER_PAGE >= total ? false : true;
-    const isGalleryVisible = !!results.length && !isLoading;
+    const isGalleryVisible = !!results.length;
 
     return (
       <AppCSS>
@@ -114,8 +114,8 @@ class App extends Component {
         {isGalleryVisible && (
           <ImageGallery onClick={this.onGalleryClick} results={results} />
         )}
-        {isShowMoreVisible && <LoadMore onClick={this.showMore} />}
         {isLoading && <Spinner />}
+        {isShowMoreVisible && <LoadMore onClick={this.showMore} />}
         {isModalShown && <Modal source={modalImg} onClick={this.closeModal} />}
       </AppCSS>
     );
